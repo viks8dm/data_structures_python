@@ -36,11 +36,11 @@ class LRU_Cache(object):
     def set(self, key, value):
         # Set the value if the key is not present in the cache. If the cache is at capacity remove the oldest item. 
         if (self.capacity == 0):
-            print("ERROR: LRU-Cache capacity not definited")
+            # print("ERROR: [set] LRU-Cache capacity not definited")
             return -1
         
-        if ((key is None) or (value is None)):
-            print("ERROR: Key or Value cannot be None")
+        if ((key is None) or (not bool(key)) or (value is None)):
+            # print("ERROR: [set] Key or Value cannot be None")
             return -1
 
         if key in self.cache:
@@ -63,8 +63,8 @@ class LRU_Cache(object):
     #--------
     def get(self, key):
         # Retrieve item from provided key. Return -1 if nonexistent. 
-        if ((key is None) or (key not in self.cache)):
-            # print("ERROR: Key not found in cache")
+        if ((key is None) or (not bool(key)) or (key not in self.cache)):
+            # print("ERROR: [get] Key not found in cache")
             return -1
 
         node = self.cache[key]
@@ -118,45 +118,68 @@ class LRU_Cache(object):
   
 ############## main ############
 if __name__ == "__main__":
+    # test - 1
+    print("---------- test - 1: default sample provided")
     our_cache = LRU_Cache(5)
+    our_cache.set(1, 1)
+    our_cache.set(2, 2)
+    our_cache.set(3, 3)
+    our_cache.set(4, 4)
+    print("Pass" if our_cache.get(1)==1 else "FAIL")
+    print("Pass" if our_cache.get(2)==2 else "FAIL")
+    print("Pass" if our_cache.get(9)==-1 else "FAIL")
+    our_cache.set(5, 5) 
+    our_cache.set(6, 6)
+    print("Pass" if our_cache.get(3)==-1 else "FAIL")
 
-    test = False
+    # # # print nodes from recent to last used
+    # print('===== cache values in order ====')
+    # node = our_cache.head
+    # while node:
+    #     # if node.prev is not None:
+    #     #     print((node.value, node.prev.value))
+    #     print(node.value)
+    #     node = node.next
 
-    if (test):
-        our_cache.set(1, 1)
-        our_cache.set(2, 2)
-        our_cache.set(3, 3)
-        our_cache.set(4, 4)
+    # test - 2
+    print("---------- test - 2: zero capacity case")
+    zero_chache = LRU_Cache(0)
+    print("Pass" if zero_chache.set(1,1)==-1 else "FAIL")
+    print("Pass" if zero_chache.set(2,2,)==-1 else "FAIL")
+    print("Pass" if zero_chache.get(1)==-1 else "FAIL")
 
-        assert our_cache.get(1)==1, "return value != 1 for get(1)"
-        assert our_cache.get(2)==2, "return value != 2 for get(2)"
-        assert our_cache.get(9)==-1, "return value != -1 for get(9)"
+    # test - 3
+    print("---------- test - 3: incorrect data types")
+    data_cache = LRU_Cache(5)
+    data_cache.set(1, 1)
+    data_cache.set(2, 2)
+    data_cache.set(3, 3)
+    data_cache.set(4, 4)
 
-        our_cache.set(5, 5) 
-        our_cache.set(6, 6)
+    print("Pass" if data_cache.get(None)==-1 else "FAIL")
+    print("Pass" if data_cache.get(False)==-1 else "FAIL")
+    print("Pass" if data_cache.get('')==-1 else "FAIL")
+    print("Pass" if data_cache.get(0)==-1 else "FAIL")
+    print("Pass" if data_cache.set('', 1)==-1 else "FAIL")
 
-        assert our_cache.get(3)==-1, "return value != -1 for get(3)"
+    # test - 4
+    print("---------- test - 4: random tests")
+    my_cache = LRU_Cache(5)
+    my_cache.set(1, 1)
+    my_cache.set(2, 2)
+    my_cache.set(3, 3)
+    my_cache.set(4, 4)
+    my_cache.set(5, 5)
+    my_cache.set(6, 6)
+    my_cache.set(7, 7)
 
-        # # print nodes from recent to last used
-        print('===== cache values in order ====')
-        node = our_cache.head
-        while node:
-            # if node.prev is not None:
-            #     print((node.value, node.prev.value))
-            print(node.value)
-            node = node.next
+    print("Pass" if my_cache.get(5)==5 else "FAIL")
+    print("Pass" if my_cache.get(1)==-1 else "FAIL")
+    print("Pass" if my_cache.get(-2)==-1 else "FAIL")
 
-    else:
-        our_cache.set(1, 1)
-        our_cache.set(2, 2)
-        our_cache.set(3, 3)
-        our_cache.set(4, 4)
+    my_cache.set(8, 1)
+    my_cache.set(9, 9)
 
-        our_cache.get(1)       # returns 1
-        our_cache.get(2)       # returns 2
-        our_cache.get(9)      # returns -1 because 9 is not present in the cache
-
-        our_cache.set(5, 5) 
-        our_cache.set(6, 6)
-
-        our_cache.get(3)      # returns -1 because the cache reached it's capacity and 3 was the least recently used entry
+    print("Pass" if my_cache.get(5)==5 else "FAIL")
+    print("Pass" if my_cache.get(4)==-1 else "FAIL")
+    print("Pass" if my_cache.get(8)==1 else "FAIL")
