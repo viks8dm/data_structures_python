@@ -83,9 +83,9 @@ def decode_tree(node, bit_val=""):
 
 #######################
 def huffman_encoding(data):
-    if data is None or data=='':
-        print("ERROR: no data provided for encoding")
-        return None, None
+    if (data is None) or (data=='') or (not bool(data)):
+        # print("ERROR: no data provided for encoding")
+        return '', None
     
     # get frequency
     for s in data:
@@ -134,19 +134,99 @@ def huffman_decoding(data,tree):
     return decoded_string
 
 #######################
-if __name__ == "__main__":
-    codes = {}
-    a_great_sentence = "The bird is the word"
+def message_info(test_string):
+    """
+    function to get information for a message type to develop test cases
+    """
+    print ("The size of the data is: {}\n".format(sys.getsizeof(test_string)))
+    print ("The content of the data is: {}\n".format(test_string))
 
-    print ("The size of the data is: {}\n".format(sys.getsizeof(a_great_sentence)))
-    print ("The content of the data is: {}\n".format(a_great_sentence))
+    encoded_data, tree = huffman_encoding(test_string)
 
-    encoded_data, tree = huffman_encoding(a_great_sentence)
-
-    print ("The size of the encoded data is: {}\n".format(sys.getsizeof(int(encoded_data, base=2))))
+    if len(encoded_data)>0:
+        print ("The size of the encoded data is: {}\n".format(sys.getsizeof(int(encoded_data, base=2))))
+    else:
+        print ("The size of the encoded data is: 0\n")
+        return
     print ("The content of the encoded data is: {}\n".format(encoded_data))
 
     decoded_data = huffman_decoding(encoded_data, tree)
 
     print ("The size of the decoded data is: {}\n".format(sys.getsizeof(decoded_data)))
-    print ("The content of the encoded data is: {}\n".format(decoded_data))
+    print ("The content of the decoded data is: {}\n".format(decoded_data))
+
+#######################
+def test(test_string, test_string_size, test_encoded_data, test_encode_size):
+    encoded_data, tree = huffman_encoding(test_string)
+
+    print("Pass \t (string-size)" if sys.getsizeof(test_string)==test_string_size else "FAIL (string-size)")
+    print("Pass \t (encoding)" if encoded_data==test_encoded_data else "FAIL (encoding)")
+
+    if (test_encode_size == 0):
+        print('--> not checking other params since encoded data size is 0')
+        return
+    
+    print("Pass \t (encoding-size)" if sys.getsizeof(int(encoded_data, base=2))==test_encode_size else "FAIL (encoding-size)")
+    
+    decoded_data = huffman_decoding(encoded_data, tree)
+
+    print("Pass \t (decoded-size)" if sys.getsizeof(decoded_data)==test_string_size else "FAIL (decoded-size)")
+    print("Pass \t (decoded-string)" if decoded_data==test_string else "FAIL (decoded-string)")
+    return
+
+#######################
+if __name__ == "__main__":
+    get_tests = True
+
+    # get_message_info = False
+    # if get_message_info:
+    #     # get message info
+    #     print('-----------------  getting information --------')
+    #     test_string = 'done with data structures for now -:)'
+    #     codes = {}
+    #     message_info(test_string)
+    #     get_tests = False
+
+    if get_tests:
+        #-----------------------
+        # test - 1-4 : iinvalid cases
+        print('=======================================')
+        print("testing: invalid cases")
+        test_string = [None, '', False, {}]
+        test_string_size = [16, 37, 24, 280]
+        test_encoded_data = ['','','','']
+        test_encode_size = [0, 0, 0, 0]
+
+        for i in range(4):
+            codes = {}
+            print('----------- test - ' + str(i+1) + '--------------')
+            test(test_string[i], test_string_size[i], test_encoded_data[i], test_encode_size[i])
+
+        # -----------------------
+        # test 5-9: repetitive and random cases
+        print('=======================================')
+        print("testing: repetitive and random cases")
+        test_string = ['000000000', '1111111111', 'vvv', 'hello world',
+                    'done with data structures for now -:)' ]
+        test_string_size = [46, 47, 40, 48, 74]
+        test_encode_size = [24, 24, 24, 24, 44]
+        test_encoded_data = ['000000000', '0000000000', '000', '00111111010110111001111001010000',
+                    '001110110100001011001111001000010011110001111111000111111100101000111001101000000001101110001001011101000110111110110010010110111110101001111010101']
+
+        for i in range(5):
+            codes = {}
+            print('----------- test - ' + str(i+5) + '--------------')
+            test(test_string[i], test_string_size[i], test_encoded_data[i], test_encode_size[i])
+
+        # -----------------------
+        # test -10
+        print('=======================================')
+        print("-------------- test - 10: default provided case -------------")
+        codes = {}
+        test_string = "The bird is the word"
+        test_string_size = 57
+        test_encode_size = 36
+        test_encoded_data = '1001001111011001100000101111110000100011010110011110110101001110101111'
+        test(test_string, test_string_size, test_encoded_data, test_encode_size)
+
+    
